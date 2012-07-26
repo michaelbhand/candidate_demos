@@ -18,6 +18,17 @@
 		this.domElement.style.height = "24px";
 		this.domElement.style.background = "url(x_wing_2.png)";
 		this.domElement.style.zIndex = "3000";
+		this.blasterElement = document.createElement("div");
+		this.blasterElement.style.borderTop = "solid 1px #0f0";
+		this.blasterElement.style.borderBottom = "solid 1px #0f0";
+		this.blasterElement.style.height = "20";
+		this.blasterElement.style.width = "20px";
+		this.blasterElement.style.position = "relative";
+		this.blasterElement.style.top = "10px";
+		this.blasterElement.style.left = "-25px";
+		// this.blasterElement.style.opacity = "0";
+		this.blasterElement.style.webkitTransform = 'rotate(-15deg)';
+		this.domElement.appendChild(this.blasterElement);
 		// this.domElement.style.border = "solid 1px #f00";
 		this.pointAtGoal();
 		document.body.appendChild(this.domElement);
@@ -31,6 +42,8 @@
 		this.y -= moveYAmount;
 		this.domElement.style.left = this.x + "px";
 		this.domElement.style.top = this.y + "px";
+		this.blasterElement.style.borderBottomWidth = Math.random() < 0.5 ? "1px" : "0";
+		this.blasterElement.style.borderTopWidth = Math.random() < 0.5 ? "1px" : "0";
 		if(moveYAmount < 1 && moveXAmount < 1) {
 			this.goalY = getRandomPoint(windowHeight);
 			this.goalX = getRandomPoint(windowWidth);
@@ -64,6 +77,18 @@
 		this.domElement.style.background = "url(mini_ty_2.png)";
 		this.domElement.style.borderRadius = "5px";
 		this.domElement.style.opacity = "1";
+
+		this.blasterElement = document.createElement("div");
+		this.blasterElement.style.borderTop = "solid 1px #f00";
+		this.blasterElement.style.borderBottom = "solid 1px #f00";
+		this.blasterElement.style.height = "5px";
+		this.blasterElement.style.width = "10px";
+		this.blasterElement.style.position = "relative";
+		this.blasterElement.style.top = "8px";
+		this.blasterElement.style.left = "-15px";
+		// this.blasterElement.style.webkitTransform = 'rotate(-15deg)';
+		this.domElement.appendChild(this.blasterElement);
+
 		document.body.appendChild(this.domElement);
 	}
 
@@ -94,7 +119,20 @@
 		}
 	};
 
+	Follower.prototype.blasterOff = function(){
+		this.blasterElement.style.display = 'none';
+	};
+
+	Follower.prototype.blasterFire = function(){
+		this.blasterElement.style.display = 'block';
+		this.blasterElement.style.borderBottomWidth = Math.random() < 0.5 ? "1px" : "0";
+		this.blasterElement.style.borderTopWidth = Math.random() < 0.5 ? "1px" : "0";
+	};
+
+
+
 	Follower.prototype.explode = function(){
+		this.blasterOff();
 		this.domElement.style.background = "url(explode.png)";
 		this.seed = 0;
 		this.live = 0;
@@ -109,11 +147,12 @@
 		if(distanceToTarget < 800) {
 			moveXAmount = ((this.x - this.target.x)/500) * this.speed;
 			moveYAmount = ((this.y - this.target.y)/500) * this.speed;
+
+
 			this.x += moveXAmount * this.seed;
 			this.y += moveYAmount * this.seed;
 			this.domElement.style.left = this.x + "px";
 			this.domElement.style.top = this.y + "px";
-			this.pointAtGoal();
 
 			if(this.x <= 0 || this.x >= windowWidth || this.y <= 0 || this.y >= windowHeight ){
 				this.relocate();
@@ -122,6 +161,14 @@
 			if (distanceToTarget < 100) {
 			    this.explode();
 			}
+
+		if(this.live){
+			this.pointAtGoal();
+			this.blasterFire();
+		}
+
+		} else {
+			this.blasterOff();
 		}
 	};
 
@@ -156,7 +203,7 @@
 	function update() {
 		for(var i = 0, l = actors.length; i < l; i++) {
 			// actors[i].update();
-			if(actors[i].opacity > 0.1){
+			if(actors[i].opacity > 0.1 ){
 				actors[i].update();			
 			}
 		}
