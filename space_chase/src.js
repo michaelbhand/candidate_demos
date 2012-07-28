@@ -35,20 +35,35 @@
 	}
 
 	Wanderer.prototype.update = function() {
-		var moveXAmount, moveYAmount;
-		moveXAmount = (this.x - this.goalX)/50;
-		moveYAmount = (this.y - this.goalY)/50;
-		this.x -= moveXAmount;
-		this.y -= moveYAmount;
-		this.domElement.style.left = this.x + "px";
-		this.domElement.style.top = this.y + "px";
-		this.blasterElement.style.borderBottomWidth = Math.random() < 0.5 ? "1px" : "0";
-		this.blasterElement.style.borderTopWidth = Math.random() < 0.5 ? "1px" : "0";
-		if(moveYAmount < 1 && moveXAmount < 1) {
-			this.goalY = getRandomPoint(windowHeight);
-			this.goalX = getRandomPoint(windowWidth);
-			this.pointAtGoal();
+		if(this.live) {
+			var moveXAmount, moveYAmount,
+			moveXAmount = (this.x - this.goalX)/50;
+			moveYAmount = (this.y - this.goalY)/50;
+			this.x -= moveXAmount;
+			this.y -= moveYAmount;
+			this.domElement.style.left = this.x + "px";
+			this.domElement.style.top = this.y + "px";
+			this.blasterElement.style.borderBottomWidth = Math.random() < 0.5 ? "1px" : "0";
+			this.blasterElement.style.borderTopWidth = Math.random() < 0.5 ? "1px" : "0";
+			if(Math.abs(this.distanceToTarget()) < 20) {
+				this.updateGoal();
+			}
+		} else {
+			if(this.opacity > 0 && !this.live){
+				this.fade();
+			}
 		}
+	};
+
+	Wanderer.prototype.distanceToTarget = function() {
+		return (Math.sqrt(Math.pow(this.goalX - this.x, 2) +
+						  Math.pow(this.goalY - this.y, 2)));
+	};
+
+	Wanderer.prototype.updateGoal = function() {
+		this.goalY = getRandomPoint(windowHeight);
+		this.goalX = getRandomPoint(windowWidth);
+		this.pointAtGoal();
 	};
 
 
@@ -57,6 +72,26 @@
 		diffx = this.x - this.goalX;
 		diffy = this.y - this.goalY;
 		this.domElement.style.webkitTransform = 'rotate(' + Math.floor(Math.atan2(diffy , diffx) * (180/Math.PI)) + 'deg)';
+	};
+
+	Wanderer.prototype.explode = function(){
+		this.blasterOff();
+		this.domElement.style.background = "url(explode.png)";
+		this.seed = 0;
+		this.live = 0;
+	};
+
+	Wanderer.prototype.blasterOff = function(){
+		this.blasterElement.style.display = 'none';
+	};
+
+	Wanderer.prototype.fade = function(){
+		this.opacity -= 0.02;
+		this.domElement.style.opacity = this.opacity;
+		if(this.opacity <= 0.1 && this.domElement.parentNode !== null){
+			// this.parentNode.removeChild(this);
+			document.body.removeChild(this.domElement);
+		}
 	};
 
 
@@ -113,7 +148,7 @@
 	Follower.prototype.fade = function(){
 		this.opacity -= 0.02;
 		this.domElement.style.opacity = this.opacity;
-		if(this.opacity <= 0.1){
+		if(this.opacity <= 0.1 && this.domElement.parentNode !== null){
 			// this.parentNode.removeChild(this);
 			document.body.removeChild(this.domElement);
 		}
@@ -172,6 +207,7 @@
 		}
 	};
 
+
 	function getRandomPoint(max) {
 		return Math.ceil(Math.random() * max);
 	}
@@ -201,15 +237,116 @@
 	}
 
 	function update() {
+		var followersAlive = false,
+			lastActor;
 		for(var i = 0, l = actors.length; i < l; i++) {
-			// actors[i].update();
-			if(actors[i].opacity > 0.1 ){
-				actors[i].update();			
+			if(actors[i] && actors[i].opacity > 0.1 ){
+				actors[i].update();
+				if(actors[i] instanceof Follower) followersAlive = true;
+			} else {
+				delete actors[i];
 			}
 		}
-		setTimeout(update, 10);
+		if(!followersAlive) {
+			for(var i = 0, l = actors.length; i < l; i++) {
+				if(!actors[i]) {
+					actors.splice(i, 1);
+					l--;
+					i--;
+				}
+			}
+			for(var i = 0, l = actors.length; i < l; i++) {
+				actors[i].goalX = getRandomPoint(600) + 700;
+				actors[i].goalY = getRandomPoint(250) + 400;
+				actors[i].pointAtGoal();
+			}
+
+			Wanderer.prototype.updateGoal = function() {
+				var explosion = document.createElement("div");
+				explosion.style.background = "url(explode.png)";
+				explosion.style.width = "32px";
+				explosion.style.height = "24px";
+				explosion.style.position = "absolute";
+				explosion.style.top = this.y;
+				explosion.style.left = this.x;
+				document.body.appendChild(explosion);
+
+				this.goalX = getRandomPoint(600) + 700;
+				this.goalY = getRandomPoint(250) + 400;
+				this.pointAtGoal();
+			};
+			
+			setTimeout(endGameUpdate, 10);
+		} else {
+			setTimeout(update, 10);
+		}
+	}
+
+	Explosion = (function() {
+		var img = document.createElement("img"),
+			top = 700,
+			left = 1100,
+			opacity = 1;
+			
+		img.src = "explosion.png";
+		img.width = 0;
+		img.height = 0;
+		img.style.position = "absolute";
+		img.style.top = "" + top + "px";
+		img.style.left = ""+ left + "px";
+		img.style.display = "none";
+		img.style.zIndex = "5000";
+
+		
+
+		return {
+			show: function() {
+				img.style.display = "block";
+				document.body.appendChild(img);
+			},
+			grow: function() {
+				img.width += 6;
+				img.height += 6;
+				top -= 3;
+				left -= 3;
+				img.style.top = "" + top + "px";
+				img.style.left = "" + left + "px";
+			},
+			fade: function() {
+				opacity -= 0.01;
+				img.style.opacity = opacity;
+			}
+		};
+	})();
+
+	var tick = 0;
+	function endGameUpdate() {
+		tick++;
+		if(tick < 500) {
+			updateActors();
+		} else if(tick === 500) {
+			updateActors();
+			Explosion.show();
+		} else if (tick > 500 && tick < 900) {
+			updateActors();
+			Explosion.grow();
+		} else if (tick === 900) {
+			document.body.style.background = "url(star_chase_bg_empty.png)";
+			document.body.innerHTML = "";
+			Explosion.show();
+		} else if (tick > 900 && tick < 2000) {
+			if(tick % 2 === 0) Explosion.fade();
+		} else if (tick > 2000) {
+			return;
+		}
+		setTimeout(endGameUpdate, 10);
+	}
+
+	function updateActors() {
+		for(var i = 0, l = actors.length; i < l; i++) {
+			actors[i].update();
+		}
 	}
 
 	update();
-
 })();
