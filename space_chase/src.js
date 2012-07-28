@@ -438,6 +438,6 @@
 		};
 	})();
 	
-	actors = createWanderersWithFollowers(20, 0);
+	actors = createWanderersWithFollowers(20, 20);
 	update();
 })();
