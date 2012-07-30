@@ -51,6 +51,39 @@
 		}
 	};
 
+	function Destroyer() {
+		this.width = 1847;
+		this.height = 462;
+		this.x = windowWidth;
+		this.y = getRandomPoint(windowHeight - this.height); 
+		this.domElement = document.createElement("div");
+		this.domElement.style.position = "absolute";
+		this.domElement.style.left = this.x + "px";
+		this.domElement.style.top = this.y + "px";
+		this.domElement.style.width = this.width + "px";
+		this.domElement.style.height = this.height + "px";
+		this.domElement.style.zIndex = "500";
+
+		this.domElement.style.background = "url(Imperial_I-Class_HD.png)";
+		document.body.appendChild(this.domElement);
+	}
+
+	Destroyer.prototype.reset = function() {
+			this.y = getRandomPoint(windowHeight - this.height); 
+			this.x = windowWidth;
+			this.domElement.style.top = this.y + "px";
+	};
+
+	Destroyer.prototype.update = function() {
+		if(this.x > this.width * -1){
+			this.x -= 1;
+		} else {
+			this.reset();
+		}
+		console.log("Destroyer x: " + this.x + ", Destroyer width: " + this.width)
+			this.domElement.style.webkitTransform = "translateX(-1px)";
+			// this.domElement.style.left = this.x + "px";
+	};
 
 	Wanderer.prototype.pointAtGoal = function() {
 		var diffx, diffy;
@@ -162,10 +195,14 @@
 			    this.explode();
 			}
 
-		if(this.live){
-			this.pointAtGoal();
-			this.blasterFire();
-		}
+			if(this.live){
+				this.pointAtGoal();
+				if( this.seed < 0){
+					this.blasterFire();
+				} else {
+					this.blasterOff();
+				}
+			}
 
 		} else {
 			this.blasterOff();
@@ -176,9 +213,11 @@
 		return Math.ceil(Math.random() * max);
 	}
 
+
 	function createWanderersWithFollowers(wCount, fCount) {
 		var actors = [],
 			wanderer;
+
 		while(wCount--) {
 			wanderer = new Wanderer(parseInt(windowWidth/2), parseInt(windowHeight/2));
 			actors.push(wanderer);
@@ -189,7 +228,7 @@
 	}
 
 	var actors = createWanderersWithFollowers(20, 50);
-
+	var destroyer = new Destroyer(); 
 	function createFollowers(numToCreate, targetWanderer) {
 		var followers = [], x, y;
 		for(var i = numToCreate; i--;) {
@@ -201,13 +240,15 @@
 	}
 
 	function update() {
+		destroyer.update();
 		for(var i = 0, l = actors.length; i < l; i++) {
+			actors[i].domElement.style.zIndex = i;
 			// actors[i].update();
 			if(actors[i].opacity > 0.1 ){
 				actors[i].update();			
 			}
 		}
-		setTimeout(update, 10);
+		setTimeout(update, 1);
 	}
 
 	update();
