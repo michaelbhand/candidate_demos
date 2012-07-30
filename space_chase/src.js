@@ -81,8 +81,8 @@
 			this.reset();
 		}
 		console.log("Destroyer x: " + this.x + ", Destroyer width: " + this.width)
-			this.domElement.style.webkitTransform = "translateX(-1px)";
-			// this.domElement.style.left = this.x + "px";
+			// this.domElement.style.webkitTransform = "translateX(-1px)";
+			this.domElement.style.left = this.x + "px";
 	};
 
 	Wanderer.prototype.pointAtGoal = function() {
