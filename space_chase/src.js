@@ -87,7 +87,7 @@
 		this.domElement.style.top = this.y + "px";
 		this.domElement.style.width = this.width + "px";
 		this.domElement.style.height = this.height + "px";
-		this.domElement.style.zIndex = "500";
+		this.domElement.style.zIndex = "100";
 		this.domElement.style.opacity = "1";
 		this.domElement.style.background = "url(Imperial_I-Class_HD.png)";
 		this.domElement.style.webkitTransformOrigin = "75% 50%";
@@ -115,7 +115,7 @@
 		this.opacity -= 0.01;
 		this.domElement.style.opacity = this.opacity;
 		this.domElement.style.webkitTransformOrigin = "75% 50%";
-		this.domElement.style.webkitTransform = 'scale(' + this.opacity + ') rotate(' + ( 1 - this.opacity) * -1 * 10 + 'deg)';
+		this.domElement.style.webkitTransform = 'scale(' + this.opacity + ') rotate(' + ( 1 - this.opacity) * -1 * 20 + 'deg)';
 		// this.domElement.style.webkitTransform = 'rotate(' + ( 1 - this.opacity) * -1 * 10 + 'deg)';
 		// console.log('Destroyer opacity: ' + this.opacity);
 	};
@@ -325,7 +325,6 @@
 		for(var i = 0, l = actors.length; i < l; i++) {
 			if(actors[i] && actors[i].opacity > 0.1 ){
 				actors[i].update();
-				actors[i].domElement.style.zIndex = i;
 				if(actors[i] instanceof Follower) followersAlive = true;
 			} else {
 				delete actors[i];
@@ -441,6 +440,7 @@
 
 	function updateActors() {
 		for(var i = 0, l = actors.length; i < l; i++) {
+			actors[i].domElement.style.zIndex = i;
 			actors[i].update();
 		}
 	}
@@ -504,6 +504,6 @@
 		};
 	})();
 	
-	actors = createWanderersWithFollowers(60, 1);
+	actors = createWanderersWithFollowers(30, 2);
 	update();
 })();
