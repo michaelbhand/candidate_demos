@@ -55,6 +55,9 @@
 		this.domElement.style.top = this.y + "px";
 		this.blasterElement.style.borderBottomWidth = Math.random() < 0.5 ? "1px" : "0";
 		this.blasterElement.style.borderTopWidth = Math.random() < 0.5 ? "1px" : "0";
+
+
+
 		if(Math.abs(this.distanceToTarget()) < 20) {
 			this.updateGoal();
 		}
@@ -112,8 +115,8 @@
 		this.opacity -= 0.01;
 		this.domElement.style.opacity = this.opacity;
 		this.domElement.style.webkitTransformOrigin = "75% 50%";
-		this.domElement.style.webkitTransform = 'scale(' + this.opacity + ')';
-		this.domElement.style.webkitTransform = 'rotate(' + ( 1 - this.opacity) * -1 * 10 + 'deg)';
+		this.domElement.style.webkitTransform = 'scale(' + this.opacity + ') rotate(' + ( 1 - this.opacity) * -1 * 10 + 'deg)';
+		// this.domElement.style.webkitTransform = 'rotate(' + ( 1 - this.opacity) * -1 * 10 + 'deg)';
 		// console.log('Destroyer opacity: ' + this.opacity);
 	};
 // 
@@ -225,10 +228,12 @@
 
 	Follower.prototype.blasterOff = function() {
 		this.blasterElement.style.display = 'none';
+		this.target.blasterElement.style.display = 'none';
 	};
 
 	Follower.prototype.blasterFire = function() {
 		this.blasterElement.style.display = 'block';
+		this.target.blasterElement.style.display = 'block';
 		this.blasterElement.style.borderBottomWidth = Math.random() < 0.5 ? "1px" : "0";
 		this.blasterElement.style.borderTopWidth = Math.random() < 0.5 ? "1px" : "0";
 	};
@@ -349,6 +354,7 @@
 
 	function targetDeathStar() {
 		for(var i = 0, l = actors.length; i < l; i++) {
+			actors[i].blasterElement.style.display = 'block';
 			actors[i].goalX = getRandomPoint(600) + 700;
 			actors[i].goalY = getRandomPoint(250) + 400;
 			actors[i].pointAtGoal();
@@ -498,6 +504,6 @@
 		};
 	})();
 	
-	actors = createWanderersWithFollowers(20, 20);
+	actors = createWanderersWithFollowers(60, 1);
 	update();
 })();
