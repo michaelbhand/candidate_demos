@@ -1,7 +1,38 @@
 (function() {
 	var windowWidth = window.innerWidth,
 		windowHeight = window.innerHeight,
-		actors;
+		actors,deathStar;
+
+	function DeathStar(){
+		this.opacity = 1;
+		this.live = 1;
+		this.width = "1024px";
+		this.height = "1024px";
+		this.domElement = document.createElement("img");
+		this.domElement.style.position = "absolute";
+		this.domElement.style.width = this.width;
+		this.domElement.style.height = this.height;
+		this.x = Math.floor(windowWidth/2);
+		this.y = Math.floor(windowHeight/2);
+		this.domElement.style.top = Math.floor(windowHeight/2) - 512 + "px";
+		this.domElement.style.left = Math.floor(windowWidth/2) - 512 + "px";
+		this.domElement.src = "Death_Star.png";
+		this.domElement.style.zIndex = "0";
+		this.domElement.style.opacity = this.opacity;
+		this.domElement.style.webkitTransformOrigin = "50% 50%";
+		document.body.appendChild(this.domElement);
+	};
+
+
+	DeathStar.prototype.fade = function() {
+		var rad2deg = 180/Math.PI;
+		this.opacity -= 0.01;
+		this.domElement.style.opacity = this.opacity;
+		this.domElement.style.webkitTransformOrigin = "50% 50%";
+		this.domElement.style.webkitTransform = 'scale(' + (1.0 + 1 - this.opacity) + ') rotate(' + ( 1 - this.opacity) * 20 + 'deg)';
+	};
+
+	deathStar = new DeathStar();
 
 	function Wanderer(x, y) {
 		this.x = x;
@@ -15,9 +46,9 @@
 		this.domElement.style.position = "absolute";
 		this.domElement.style.top = y + "px";
 		this.domElement.style.left = x + "px";
-		this.domElement.style.width = "32px";
-		this.domElement.style.height = "24px";
-		this.domElement.style.background = "url(x_wing_2.png)";
+		this.domElement.style.width = "100px";
+		this.domElement.style.height = "70px";
+		this.domElement.style.background = "url(x_wing_medium.png)";
 		this.domElement.style.zIndex = "3000";
 		
 		this.blasterElement = document.createElement("div");
@@ -145,7 +176,7 @@
 
 	Wanderer.prototype.explode = function() {
 		this.blasterOff();
-		this.domElement.style.background = "url(explode.png)";
+		this.domElement.style.background = "url(explode_medium.png)";
 		this.seed = 0;
 		this.live = 0;
 	};
@@ -176,9 +207,9 @@
 		this.domElement.style.position = "absolute";
 		this.domElement.style.top = y + "px";
 		this.domElement.style.left = x + "px";
-		this.domElement.style.width = "32px";
-		this.domElement.style.height = "24px";
-		this.domElement.style.background = "url(mini_ty_2.png)";
+		this.domElement.style.width = "100px";
+		this.domElement.style.height = "85px";
+		this.domElement.style.background = "url(tie_fighter_medium.png)";
 		this.domElement.style.borderRadius = "5px";
 		this.domElement.style.opacity = "1";
 
@@ -240,7 +271,7 @@
 
 	Follower.prototype.explode = function() {
 		this.blasterOff();
-		this.domElement.style.background = "url(explode.png)";
+		this.domElement.style.background = "url(explode_medium.png)";
 		this.seed = 0;
 		this.live = 0;
 	};
@@ -361,9 +392,9 @@
 
 		Wanderer.prototype.updateGoal = function() {
 			var explosion = document.createElement("div");
-			explosion.style.background = "url(explode.png)";
-			explosion.style.width = "32px";
-			explosion.style.height = "24px";
+			explosion.style.background = "url(explode_medium.png)";
+			explosion.style.width = "100px";
+			explosion.style.height = "100px";
 			explosion.style.position = "absolute";
 			explosion.style.top = this.y;
 			explosion.style.left = this.x;
@@ -403,16 +434,18 @@
 
 	var Explosion = (function() {
 		var img = document.createElement("img"),
-			top = 700,
-			left = 1100,
+			top = Math.floor(windowWidth/2 - 556),
+			left = Math.floor(windowHeight/2 - 718),
 			opacity = 1;
 			
-		img.src = "explosion.png";
-		img.width = 0;
-		img.height = 0;
+		img.src = "Space_Explosion.png";
+		img.width = 1536;
+		img.height = 1152;
+		// top -= Math.floor(img.height/2);
+		// left -= Math.floor(img.width/2);
 		img.style.position = "absolute";
 		img.style.top = "" + top + "px";
-		img.style.left = ""+ left + "px";
+		img.style.left = "" + left + "px";
 		img.style.zIndex = "5000";
 
 		return {
@@ -421,6 +454,7 @@
 			},
 			grow: function() {
 				destroyer.fade();
+				deathStar.fade();
 				img.width += 10;
 				img.height += 10;
 				top -= 5;
