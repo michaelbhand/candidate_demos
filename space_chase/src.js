@@ -1,7 +1,43 @@
+function getRandomPoint(max) {
+	return Math.ceil(Math.random() * max);
+}
+
+
 (function() {
 	var windowWidth = window.innerWidth,
 		windowHeight = window.innerHeight,
-		actors;
+		actors,deathStar;
+
+	function DeathStar(){
+		this.opacity = 1;
+		this.live = 1;
+		this.width = "1024px";
+		this.height = "1024px";
+		this.domElement = document.createElement("img");
+		this.domElement.style.position = "absolute";
+		this.domElement.style.width = this.width;
+		this.domElement.style.height = this.height;
+		this.x = Math.floor(windowWidth/2);
+		this.y = Math.floor(windowHeight/2);
+		this.domElement.style.top = Math.floor(windowHeight/2) - 512 + "px";
+		this.domElement.style.left = Math.floor(windowWidth/2) - 512 + "px";
+		this.domElement.src = "Death_Star.png";
+		this.domElement.style.zIndex = "0";
+		this.domElement.style.opacity = this.opacity;
+		this.domElement.style.webkitTransformOrigin = "50% 50%";
+		document.body.appendChild(this.domElement);
+	};
+
+
+	DeathStar.prototype.fade = function() {
+		var rad2deg = 180/Math.PI;
+		this.opacity -= 0.01;
+		this.domElement.style.opacity = this.opacity;
+		this.domElement.style.webkitTransformOrigin = "50% 50%";
+		this.domElement.style.webkitTransform = 'scale(' + (1.0 + 1 - this.opacity) + ') rotate(' + ( 1 - this.opacity) * 20 + 'deg)';
+	};
+
+	deathStar = new DeathStar();
 
 	function Wanderer(x, y) {
 		this.x = x;
@@ -10,26 +46,27 @@
 		this.live = 1;
 		this.goalX = getRandomPoint(windowWidth);
 		this.goalY = getRandomPoint(windowHeight);
+		this.scale = Math.max(0.2,getRandomPoint(100)/100);
 		
 		this.domElement = document.createElement("div");
 		this.domElement.style.position = "absolute";
 		this.domElement.style.top = y + "px";
 		this.domElement.style.left = x + "px";
-		this.domElement.style.width = "32px";
-		this.domElement.style.height = "24px";
-		this.domElement.style.background = "url(x_wing_2.png)";
+		this.domElement.style.width = "100px";
+		this.domElement.style.height = "70px";
+		this.domElement.style.background = "url(x_wing_medium.png)";
 		this.domElement.style.zIndex = "3000";
 		
 		this.blasterElement = document.createElement("div");
 		this.blasterElement.style.borderTop = "solid 1px #0f0";
 		this.blasterElement.style.borderBottom = "solid 1px #0f0";
-		this.blasterElement.style.height = "20";
-		this.blasterElement.style.width = "20px";
+		this.blasterElement.style.height = "70px";
+		this.blasterElement.style.width = "40px";
 		this.blasterElement.style.position = "relative";
-		this.blasterElement.style.top = "10px";
-		this.blasterElement.style.left = "-25px";
+		this.blasterElement.style.top = "5px";
+		this.blasterElement.style.left = "-20px";
 		// this.blasterElement.style.opacity = "0";
-		this.blasterElement.style.webkitTransform = 'rotate(-15deg)';
+		this.blasterElement.style.webkitTransform = 'rotate(-15deg) skew(10deg,10deg)';
 		this.domElement.appendChild(this.blasterElement);
 		// this.domElement.style.border = "solid 1px #f00";
 		this.pointAtGoal();
@@ -37,6 +74,7 @@
 	}
 
 	Wanderer.prototype.update = function() {
+		this.pointAtGoal();
 		if(this.live) {
 			this.move();
 		} else {
@@ -71,7 +109,6 @@
 	Wanderer.prototype.updateGoal = function() {
 		this.goalY = getRandomPoint(windowHeight);
 		this.goalX = getRandomPoint(windowWidth);
-		this.pointAtGoal();
 	};
 
 	function Destroyer() {
@@ -87,7 +124,7 @@
 		this.domElement.style.top = this.y + "px";
 		this.domElement.style.width = this.width + "px";
 		this.domElement.style.height = this.height + "px";
-		this.domElement.style.zIndex = "500";
+		this.domElement.style.zIndex = "100";
 		this.domElement.style.opacity = "1";
 		this.domElement.style.background = "url(Imperial_I-Class_HD.png)";
 		this.domElement.style.webkitTransformOrigin = "75% 50%";
@@ -115,7 +152,7 @@
 		this.opacity -= 0.01;
 		this.domElement.style.opacity = this.opacity;
 		this.domElement.style.webkitTransformOrigin = "75% 50%";
-		this.domElement.style.webkitTransform = 'scale(' + this.opacity + ') rotate(' + ( 1 - this.opacity) * -1 * 10 + 'deg)';
+		this.domElement.style.webkitTransform = 'scale(' + this.opacity + ') rotate(' + ( 1 - this.opacity) * -1 * 20 + 'deg)';
 		// this.domElement.style.webkitTransform = 'rotate(' + ( 1 - this.opacity) * -1 * 10 + 'deg)';
 		// console.log('Destroyer opacity: ' + this.opacity);
 	};
@@ -126,7 +163,7 @@
 			var diffx, diffy;
 			diffx = Math.round(this.x - this.goalX);
 			diffy = Math.round(this.y - this.goalY);
-			this.domElement.style.webkitTransform = 'rotate(' + Math.floor(memoizedAtan2(diffy , diffx) * rad2deg) + 'deg)';
+			this.domElement.style.webkitTransform = 'scale(' + this.scale + ') rotate(' + Math.floor(memoizedAtan2(diffy , diffx) * rad2deg) + 'deg)';
 		};
 	})();
 
@@ -145,7 +182,7 @@
 
 	Wanderer.prototype.explode = function() {
 		this.blasterOff();
-		this.domElement.style.background = "url(explode.png)";
+		this.domElement.style.background = "url(explode_medium.png)";
 		this.seed = 0;
 		this.live = 0;
 	};
@@ -157,6 +194,8 @@
 	Wanderer.prototype.fade = function() {
 		this.opacity -= 0.02;
 		this.domElement.style.opacity = this.opacity;
+		this.domElement.style.webkitTransformOrigin = "50% 50%";
+		this.domElement.style.webkitTransform = 'scale(' + (1.0 + 1 - this.opacity) + ') rotate(' + ( 1 - this.opacity) * 20 + 'deg)';
 		if(this.opacity <= 0.1 && this.domElement.parentNode !== null){
 			// this.parentNode.removeChild(this);
 			document.body.removeChild(this.domElement);
@@ -168,6 +207,7 @@
 		this.x = x;
 		this.y = y;
 		this.opacity = 1;
+		this.scale = Math.max(0.2,getRandomPoint(100)/100);
 		this.live = 1;
 		this.target = targetWanderer;
 		this.speed = getRandomPoint(10);
@@ -176,24 +216,26 @@
 		this.domElement.style.position = "absolute";
 		this.domElement.style.top = y + "px";
 		this.domElement.style.left = x + "px";
-		this.domElement.style.width = "32px";
-		this.domElement.style.height = "24px";
-		this.domElement.style.background = "url(mini_ty_2.png)";
+		this.domElement.style.width = "100px";
+		this.domElement.style.height = "85px";
+		this.domElement.style.background = "url(tie_fighter_medium.png)";
 		this.domElement.style.borderRadius = "5px";
 		this.domElement.style.opacity = "1";
+		this.domElement.style.webkitTransform = 'scale(' + this.scale + ')';
+
 
 		this.blasterElement = document.createElement("div");
 		this.blasterElement.style.borderTop = "solid 1px #f00";
 		this.blasterElement.style.borderBottom = "solid 1px #f00";
 		this.blasterElement.style.height = "5px";
-		this.blasterElement.style.width = "10px";
+		this.blasterElement.style.width = "30px";
 		this.blasterElement.style.position = "relative";
-		this.blasterElement.style.top = "8px";
-		this.blasterElement.style.left = "-15px";
-		// this.blasterElement.style.webkitTransform = 'rotate(-15deg)';
+		this.blasterElement.style.top = "45px";
+		this.blasterElement.style.left = "-30px";
+		this.blasterElement.style.webkitTransform = 'skew(60deg,0)';
 		this.domElement.appendChild(this.blasterElement);
-
 		document.body.appendChild(this.domElement);
+		
 	}
 
 	Follower.prototype.distanceToTarget = function() {
@@ -205,9 +247,10 @@
 		var rad2deg = 180/Math.PI;
 		return function() {
 			var diffx, diffy;
+			var distanceToTarget = this.distanceToTarget();
 			diffx = Math.round(this.x - this.target.x);
 			diffy = Math.round(this.y - this.target.y);
-			this.domElement.style.webkitTransform = 'rotate(' + Math.floor(memoizedAtan2(diffy , diffx) * rad2deg) + 'deg)';
+			this.domElement.style.webkitTransform = 'scale(' + 100/distanceToTarget + ') rotate(' + Math.floor(memoizedAtan2(diffy , diffx) * rad2deg) + 'deg)';
 		};
 	})();
 
@@ -218,8 +261,16 @@
 	};
 
 	Follower.prototype.fade = function() {
+		var rad2deg = 180/Math.PI;
 		this.opacity -= 0.02;
 		this.domElement.style.opacity = this.opacity;
+
+		diffx = Math.round(this.x - this.target.x);
+		diffy = Math.round(this.y - this.target.y);
+		// this.domElement.style.webkitTransform = 'rotate(' + Math.floor(memoizedAtan2(diffy , diffx) * rad2deg) + 'deg)';
+
+		this.domElement.style.webkitTransform = 'scale(' + (1.0 + 1 - this.opacity) + ') rotate(' + Math.floor(memoizedAtan2(diffy , diffx) * rad2deg) + 'deg)';
+
 		if(this.opacity <= 0.1 && this.domElement.parentNode !== null){
 			// this.parentNode.removeChild(this);
 			document.body.removeChild(this.domElement);
@@ -240,7 +291,7 @@
 
 	Follower.prototype.explode = function() {
 		this.blasterOff();
-		this.domElement.style.background = "url(explode.png)";
+		this.domElement.style.background = "url(explode_medium.png)";
 		this.seed = 0;
 		this.live = 0;
 	};
@@ -278,6 +329,9 @@
 
 		this.x += moveXAmount * this.seed;
 		this.y += moveYAmount * this.seed;
+
+		// this.domElement.style.webkitTransform = 'scale(' + this.seed + ')';
+
 		this.domElement.style.left = this.x + "px";
 		this.domElement.style.top = this.y + "px";
 
@@ -285,10 +339,6 @@
 			this.relocate();
 		}
 	};
-
-	function getRandomPoint(max) {
-		return Math.ceil(Math.random() * max);
-	}
 
 
 	function createWanderersWithFollowers(wCount, fCount) {
@@ -325,7 +375,6 @@
 		for(var i = 0, l = actors.length; i < l; i++) {
 			if(actors[i] && actors[i].opacity > 0.1 ){
 				actors[i].update();
-				actors[i].domElement.style.zIndex = i;
 				if(actors[i] instanceof Follower) followersAlive = true;
 			} else {
 				delete actors[i];
@@ -362,9 +411,9 @@
 
 		Wanderer.prototype.updateGoal = function() {
 			var explosion = document.createElement("div");
-			explosion.style.background = "url(explode.png)";
-			explosion.style.width = "32px";
-			explosion.style.height = "24px";
+			explosion.style.background = "url(explode_medium.png)";
+			explosion.style.width = "100px";
+			explosion.style.height = "100px";
 			explosion.style.position = "absolute";
 			explosion.style.top = this.y;
 			explosion.style.left = this.x;
@@ -404,16 +453,18 @@
 
 	var Explosion = (function() {
 		var img = document.createElement("img"),
-			top = 700,
-			left = 1100,
+			top = Math.floor(windowWidth/2 - 556),
+			left = Math.floor(windowHeight/2 - 718),
 			opacity = 1;
 			
-		img.src = "explosion.png";
-		img.width = 0;
-		img.height = 0;
+		img.src = "Space_Explosion.png";
+		img.width = 1536;
+		img.height = 1152;
+		// top -= Math.floor(img.height/2);
+		// left -= Math.floor(img.width/2);
 		img.style.position = "absolute";
 		img.style.top = "" + top + "px";
-		img.style.left = ""+ left + "px";
+		img.style.left = "" + left + "px";
 		img.style.zIndex = "5000";
 
 		return {
@@ -422,6 +473,7 @@
 			},
 			grow: function() {
 				destroyer.fade();
+				deathStar.fade();
 				img.width += 10;
 				img.height += 10;
 				top -= 5;
@@ -441,6 +493,7 @@
 
 	function updateActors() {
 		for(var i = 0, l = actors.length; i < l; i++) {
+			actors[i].domElement.style.zIndex = i;
 			actors[i].update();
 		}
 	}
@@ -504,6 +557,6 @@
 		};
 	})();
 	
-	actors = createWanderersWithFollowers(60, 1);
+	actors = createWanderersWithFollowers(30, 2);
 	update();
 })();
