@@ -1,3 +1,8 @@
+function getRandomPoint(max) {
+	return Math.ceil(Math.random() * max);
+}
+
+
 (function() {
 	var windowWidth = window.innerWidth,
 		windowHeight = window.innerHeight,
@@ -41,6 +46,7 @@
 		this.live = 1;
 		this.goalX = getRandomPoint(windowWidth);
 		this.goalY = getRandomPoint(windowHeight);
+		this.scale = Math.max(0.2,getRandomPoint(100)/100);
 		
 		this.domElement = document.createElement("div");
 		this.domElement.style.position = "absolute";
@@ -54,13 +60,13 @@
 		this.blasterElement = document.createElement("div");
 		this.blasterElement.style.borderTop = "solid 1px #0f0";
 		this.blasterElement.style.borderBottom = "solid 1px #0f0";
-		this.blasterElement.style.height = "20";
-		this.blasterElement.style.width = "20px";
+		this.blasterElement.style.height = "70px";
+		this.blasterElement.style.width = "40px";
 		this.blasterElement.style.position = "relative";
-		this.blasterElement.style.top = "10px";
-		this.blasterElement.style.left = "-25px";
+		this.blasterElement.style.top = "5px";
+		this.blasterElement.style.left = "-20px";
 		// this.blasterElement.style.opacity = "0";
-		this.blasterElement.style.webkitTransform = 'rotate(-15deg)';
+		this.blasterElement.style.webkitTransform = 'rotate(-15deg) skew(10deg,10deg)';
 		this.domElement.appendChild(this.blasterElement);
 		// this.domElement.style.border = "solid 1px #f00";
 		this.pointAtGoal();
@@ -68,6 +74,7 @@
 	}
 
 	Wanderer.prototype.update = function() {
+		this.pointAtGoal();
 		if(this.live) {
 			this.move();
 		} else {
@@ -102,7 +109,6 @@
 	Wanderer.prototype.updateGoal = function() {
 		this.goalY = getRandomPoint(windowHeight);
 		this.goalX = getRandomPoint(windowWidth);
-		this.pointAtGoal();
 	};
 
 	function Destroyer() {
@@ -157,7 +163,7 @@
 			var diffx, diffy;
 			diffx = Math.round(this.x - this.goalX);
 			diffy = Math.round(this.y - this.goalY);
-			this.domElement.style.webkitTransform = 'rotate(' + Math.floor(memoizedAtan2(diffy , diffx) * rad2deg) + 'deg)';
+			this.domElement.style.webkitTransform = 'scale(' + this.scale + ') rotate(' + Math.floor(memoizedAtan2(diffy , diffx) * rad2deg) + 'deg)';
 		};
 	})();
 
@@ -188,6 +194,8 @@
 	Wanderer.prototype.fade = function() {
 		this.opacity -= 0.02;
 		this.domElement.style.opacity = this.opacity;
+		this.domElement.style.webkitTransformOrigin = "50% 50%";
+		this.domElement.style.webkitTransform = 'scale(' + (1.0 + 1 - this.opacity) + ') rotate(' + ( 1 - this.opacity) * 20 + 'deg)';
 		if(this.opacity <= 0.1 && this.domElement.parentNode !== null){
 			// this.parentNode.removeChild(this);
 			document.body.removeChild(this.domElement);
@@ -199,6 +207,7 @@
 		this.x = x;
 		this.y = y;
 		this.opacity = 1;
+		this.scale = Math.max(0.2,getRandomPoint(100)/100);
 		this.live = 1;
 		this.target = targetWanderer;
 		this.speed = getRandomPoint(10);
@@ -212,19 +221,21 @@
 		this.domElement.style.background = "url(tie_fighter_medium.png)";
 		this.domElement.style.borderRadius = "5px";
 		this.domElement.style.opacity = "1";
+		this.domElement.style.webkitTransform = 'scale(' + this.scale + ')';
+
 
 		this.blasterElement = document.createElement("div");
 		this.blasterElement.style.borderTop = "solid 1px #f00";
 		this.blasterElement.style.borderBottom = "solid 1px #f00";
 		this.blasterElement.style.height = "5px";
-		this.blasterElement.style.width = "10px";
+		this.blasterElement.style.width = "30px";
 		this.blasterElement.style.position = "relative";
-		this.blasterElement.style.top = "8px";
-		this.blasterElement.style.left = "-15px";
-		// this.blasterElement.style.webkitTransform = 'rotate(-15deg)';
+		this.blasterElement.style.top = "45px";
+		this.blasterElement.style.left = "-30px";
+		this.blasterElement.style.webkitTransform = 'skew(60deg,0)';
 		this.domElement.appendChild(this.blasterElement);
-
 		document.body.appendChild(this.domElement);
+		
 	}
 
 	Follower.prototype.distanceToTarget = function() {
@@ -236,9 +247,10 @@
 		var rad2deg = 180/Math.PI;
 		return function() {
 			var diffx, diffy;
+			var distanceToTarget = this.distanceToTarget();
 			diffx = Math.round(this.x - this.target.x);
 			diffy = Math.round(this.y - this.target.y);
-			this.domElement.style.webkitTransform = 'rotate(' + Math.floor(memoizedAtan2(diffy , diffx) * rad2deg) + 'deg)';
+			this.domElement.style.webkitTransform = 'scale(' + 100/distanceToTarget + ') rotate(' + Math.floor(memoizedAtan2(diffy , diffx) * rad2deg) + 'deg)';
 		};
 	})();
 
@@ -249,8 +261,16 @@
 	};
 
 	Follower.prototype.fade = function() {
+		var rad2deg = 180/Math.PI;
 		this.opacity -= 0.02;
 		this.domElement.style.opacity = this.opacity;
+
+		diffx = Math.round(this.x - this.target.x);
+		diffy = Math.round(this.y - this.target.y);
+		// this.domElement.style.webkitTransform = 'rotate(' + Math.floor(memoizedAtan2(diffy , diffx) * rad2deg) + 'deg)';
+
+		this.domElement.style.webkitTransform = 'scale(' + (1.0 + 1 - this.opacity) + ') rotate(' + Math.floor(memoizedAtan2(diffy , diffx) * rad2deg) + 'deg)';
+
 		if(this.opacity <= 0.1 && this.domElement.parentNode !== null){
 			// this.parentNode.removeChild(this);
 			document.body.removeChild(this.domElement);
@@ -309,6 +329,9 @@
 
 		this.x += moveXAmount * this.seed;
 		this.y += moveYAmount * this.seed;
+
+		// this.domElement.style.webkitTransform = 'scale(' + this.seed + ')';
+
 		this.domElement.style.left = this.x + "px";
 		this.domElement.style.top = this.y + "px";
 
@@ -316,10 +339,6 @@
 			this.relocate();
 		}
 	};
-
-	function getRandomPoint(max) {
-		return Math.ceil(Math.random() * max);
-	}
 
 
 	function createWanderersWithFollowers(wCount, fCount) {
