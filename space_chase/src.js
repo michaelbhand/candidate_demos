@@ -11,16 +11,19 @@ function getRandomPoint(max) {
 	function DeathStar(){
 		this.opacity = 1;
 		this.live = 1;
+		this.directionX = getRandomPoint(10)/100;
+		this.directionY = getRandomPoint(10)/100;
 		this.width = "1024px";
 		this.height = "1024px";
 		this.domElement = document.createElement("img");
 		this.domElement.style.position = "absolute";
 		this.domElement.style.width = this.width;
 		this.domElement.style.height = this.height;
-		this.x = Math.floor(windowWidth/2);
-		this.y = Math.floor(windowHeight/2);
-		this.domElement.style.top = Math.floor(windowHeight/2) - 512 + "px";
-		this.domElement.style.left = Math.floor(windowWidth/2) - 512 + "px";
+		this.x = Math.floor(windowWidth/2) - 512;
+		this.y = Math.floor(windowHeight/2) - 512;
+
+		this.domElement.style.top = this.y + "px";
+		this.domElement.style.left = this.x + "px";
 		this.domElement.src = "Death_Star.png";
 		this.domElement.style.zIndex = "0";
 		this.domElement.style.opacity = this.opacity;
@@ -35,6 +38,14 @@ function getRandomPoint(max) {
 		this.domElement.style.opacity = this.opacity;
 		this.domElement.style.webkitTransformOrigin = "50% 50%";
 		this.domElement.style.webkitTransform = 'scale(' + (1.0 + 1 - this.opacity) + ') rotate(' + ( 1 - this.opacity) * 20 + 'deg)';
+	};
+
+	DeathStar.prototype.update = function() {
+		this.x += this.directionX;
+		this.y += this.directionY;
+		this.domElement.style.top = this.y + "px";
+		this.domElement.style.left = this.x + "px";
+
 	};
 
 	deathStar = new DeathStar();
@@ -55,7 +66,9 @@ function getRandomPoint(max) {
 		this.domElement.style.width = "100px";
 		this.domElement.style.height = "70px";
 		this.domElement.style.background = "url(x_wing_medium.png)";
-		this.domElement.style.zIndex = "3000";
+		// this.domElement.style.zIndex = "3000";
+		console.log('Z index: ' + Math.ceil(this.scale*100))
+		this.domElement.style.zIndex = Math.ceil(this.scale*100);
 		
 		this.blasterElement = document.createElement("div");
 		this.blasterElement.style.borderTop = "solid 1px #0f0";
@@ -124,7 +137,7 @@ function getRandomPoint(max) {
 		this.domElement.style.top = this.y + "px";
 		this.domElement.style.width = this.width + "px";
 		this.domElement.style.height = this.height + "px";
-		this.domElement.style.zIndex = "100";
+		this.domElement.style.zIndex = "50";
 		this.domElement.style.opacity = "1";
 		this.domElement.style.background = "url(Imperial_I-Class_HD.png)";
 		this.domElement.style.webkitTransformOrigin = "75% 50%";
@@ -371,6 +384,7 @@ function getRandomPoint(max) {
 
 	function update() {
 		destroyer.update();
+		deathStar.update();
 		var followersAlive = false;
 		for(var i = 0, l = actors.length; i < l; i++) {
 			if(actors[i] && actors[i].opacity > 0.1 ){
@@ -493,7 +507,7 @@ function getRandomPoint(max) {
 
 	function updateActors() {
 		for(var i = 0, l = actors.length; i < l; i++) {
-			actors[i].domElement.style.zIndex = i;
+			// actors[i].domElement.style.zIndex = i;
 			actors[i].update();
 		}
 	}
