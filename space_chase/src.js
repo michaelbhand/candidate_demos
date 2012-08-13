@@ -15,7 +15,7 @@ function getRandomPoint(max) {
 		this.directionY = getRandomPoint(10)/100;
 		this.width = "1024px";
 		this.height = "1024px";
-		this.domElement = document.createElement("img");
+		this.domElement = document.createElement("div");
 		this.domElement.style.position = "absolute";
 		this.domElement.style.width = this.width;
 		this.domElement.style.height = this.height;
@@ -24,7 +24,7 @@ function getRandomPoint(max) {
 
 		this.domElement.style.top = this.y + "px";
 		this.domElement.style.left = this.x + "px";
-		this.domElement.src = "Death_Star.png";
+		this.domElement.style.background = "url(Death_Star.png)";
 		this.domElement.style.zIndex = "0";
 		this.domElement.style.opacity = this.opacity;
 		this.domElement.style.webkitTransformOrigin = "50% 50%";
@@ -59,6 +59,15 @@ function getRandomPoint(max) {
 		this.goalY = getRandomPoint(windowHeight);
 		this.scale = Math.max(0.2,getRandomPoint(100)/100);
 		
+		// Sounds
+		// this.sound_element = document.createElement('div');
+		this.embed_element = document.createElement('embed');
+		this.embed_element.src = 'Laser_Sound_Effect.mp3';
+		this.embed_element.hidden = true;
+		this.embed_element.autostart = true;
+		this.embed_element.loop = false;
+
+
 		this.domElement = document.createElement("div");
 		this.domElement.style.position = "absolute";
 		this.domElement.style.top = y + "px";
@@ -67,7 +76,7 @@ function getRandomPoint(max) {
 		this.domElement.style.height = "70px";
 		this.domElement.style.background = "url(x_wing_medium.png)";
 		// this.domElement.style.zIndex = "3000";
-		console.log('Z index: ' + Math.ceil(this.scale*100))
+		// console.log('Z index: ' + Math.ceil(this.scale*100))
 		this.domElement.style.zIndex = Math.ceil(this.scale*100);
 		
 		this.blasterElement = document.createElement("div");
@@ -84,6 +93,14 @@ function getRandomPoint(max) {
 		// this.domElement.style.border = "solid 1px #f00";
 		this.pointAtGoal();
 		document.body.appendChild(this.domElement);
+
+
+
+
+		// this.domElement.appendChild(this.sound_element);
+		// this.sound_element.appendChild(this.embed_element);
+		// this.sound_element.removeChild(this.embed_element)
+
 	}
 
 	Wanderer.prototype.update = function() {
@@ -110,6 +127,8 @@ function getRandomPoint(max) {
 
 
 		if(Math.abs(this.distanceToTarget()) < 20) {
+			// this.sound_element.removeChild(this.embed_element)
+			// this.sound_element.appendChild(this.embed_element);
 			this.updateGoal();
 		}
 	};
@@ -220,7 +239,8 @@ function getRandomPoint(max) {
 		this.x = x;
 		this.y = y;
 		this.opacity = 1;
-		this.scale = Math.max(0.2,getRandomPoint(100)/100);
+		// this.scale = Math.max(0.2,getRandomPoint(100)/100);
+		this.scale = 0.1;
 		this.live = 1;
 		this.target = targetWanderer;
 		this.speed = getRandomPoint(10);
@@ -424,17 +444,20 @@ function getRandomPoint(max) {
 		}
 
 		Wanderer.prototype.updateGoal = function() {
-			var explosion = document.createElement("div");
-			explosion.style.background = "url(explode_medium.png)";
-			explosion.style.width = "100px";
-			explosion.style.height = "100px";
-			explosion.style.position = "absolute";
-			explosion.style.top = this.y;
-			explosion.style.left = this.x;
-			document.body.appendChild(explosion);
+			var expl = document.createElement("div");
 
-			this.goalX = getRandomPoint(600) + 700;
-			this.goalY = getRandomPoint(250) + 400;
+			expl.style.background = "url(explode_medium.png)";
+			expl.style.width = "100px";
+			expl.style.height = "100px";
+			expl.style.position = "absolute";
+			expl.style.top = this.y - deathStar.y;
+			expl.style.left = this.x - deathStar.x;
+			expl.style.opacity = '0.8';
+
+			deathStar.domElement.appendChild(expl);
+
+			this.goalX = deathStar.x + getRandomPoint(512) + 256;
+			this.goalY = deathStar.y + getRandomPoint(512) + 256;
 			this.pointAtGoal();
 		};
 	}
@@ -462,23 +485,22 @@ function getRandomPoint(max) {
 			actors[i].pointAtGoal();
 		}
 
-		Wanderer.prototype.updateGoal = function() {}; //Don't move once offscreen
+		Wanderer.prototype.updateGoal = function(){}; //Don't move once offscreen
 	}
 
 	var Explosion = (function() {
 		var img = document.createElement("img"),
-			top = Math.floor(windowWidth/2 - 556),
-			left = Math.floor(windowHeight/2 - 718),
+			top = Math.floor(deathStar.y),
+			left = Math.floor(deathStar.x),
 			opacity = 1;
-			
 		img.src = "Space_Explosion.png";
 		img.width = 1536;
 		img.height = 1152;
 		// top -= Math.floor(img.height/2);
 		// left -= Math.floor(img.width/2);
 		img.style.position = "absolute";
-		img.style.top = "" + top + "px";
-		img.style.left = "" + left + "px";
+		img.style.top = top + "px";
+		img.style.left = left + "px";
 		img.style.zIndex = "5000";
 
 		return {
@@ -498,10 +520,16 @@ function getRandomPoint(max) {
 			fade: function() {
 				opacity -= 0.01;
 				img.style.opacity = opacity;
+				// Fade Ex
+				Wanderer.prototype.updateGoal = function() {
+					// console.log();
+
+				}
 			},
 			remove: function() {
 				document.body.removeChild(img);
 			}
+
 		};
 	})();
 
