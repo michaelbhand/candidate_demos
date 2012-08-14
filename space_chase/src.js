@@ -217,7 +217,7 @@ function getRandomPoint(max) {
 		this.domElement.style.top = y + "px";
 		this.domElement.style.left = x + "px";
 		this.domElement.style.width = "100px";
-		this.domElement.style.height = "85px";
+		this.domElement.style.height = "90px";
 		this.domElement.style.background = "url(tie_fighter_medium.png)";
 		this.domElement.style.borderRadius = "5px";
 		this.domElement.style.opacity = "1";
