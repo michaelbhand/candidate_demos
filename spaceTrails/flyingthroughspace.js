@@ -1,7 +1,7 @@
 
 // (function() {
 
-var STARS_PER_ITERTION = 10;
+var STARS_PER_ITERTION = 20;
 
 var WARP_SPEED = 0.1; // should be less than 1
 
@@ -56,7 +56,7 @@ var updateStarPosition = function(star) {
         star.element.style.top = star.y + 'px';
         star.element.style.width = star.brightness + 'px';
         star.element.style.height = star.brightness + 'px';
-        makeTrail(star.x,star.y,star.brightness);
+        // makeTrail(star.x,star.y,star.brightness);
         return true;
     }
 };
@@ -80,7 +80,10 @@ var incrementFrame = function() {
 
         star.x -= xVector
         star.y -= yVector
+            
         star.brightness += (star.distance * 0.1);
+
+        makeTrail(star.x + xVector,star.y + yVector,star.brightness);
 
         if (!updateStarPosition(star)) {
             star.element.parentNode.removeChild(star.element);
