@@ -1,7 +1,7 @@
 
 // (function() {
 
-var STARS_PER_ITERTION = 50;
+var STARS_PER_ITERTION = 10;
 
 var WARP_SPEED = 0.1; // should be less than 1
 
@@ -40,19 +40,10 @@ var makeTrail = function(x,y,w){
     t.style.height = w + 'px';
     t.style.opacity = 0.9;
 
-setTimeout(function(){ t.style.opacity = 0; },1);
-//     var fadeTrail = function(){
-//         if(t){
-//             t.style.opacity = t.style.opacity - 0.1; 
-//             // fadeTrail();
-//         }; 
-//     };
-// setTimeout(fadeTrail, 10);
-
-// fadeTrail();
+setTimeout(function(){ t.style.opacity = 0; t.style.backgroundColor = '#f00';},1);
 
     document.body.appendChild(t);
-    setTimeout(function(){ document.body.removeChild(t)},1000);
+    setTimeout(function(){ document.body.removeChild(t)},2000);
 };
 
 var updateStarPosition = function(star) {
