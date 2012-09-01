@@ -1,9 +1,9 @@
 
 // (function() {
 
-var STARS_PER_ITERTION = 20;
+var STARS_PER_ITERTION = 10;
 
-var WARP_SPEED = 0.1; // should be less than 1
+var WARP_SPEED = .5; // should be less than 1
 
 var getRandomValue = function(lbound, ubound) {
     return window.Math.random() * (ubound - lbound) + lbound;
@@ -23,7 +23,7 @@ var spawnStar = function() {
         x: getRandomValue(1, window.innerWidth),
         y: getRandomValue(1, window.innerHeight),
         brightness: getRandomValue(1, 3),
-        distance: getRandomValue(0.01, 10),
+        distance: getRandomValue(0.01, 1),
         element: document.createElement('div')
     };
     star.element.className = 'star';
@@ -40,7 +40,7 @@ var makeTrail = function(x,y,w){
     t.style.height = w + 'px';
     t.style.opacity = 0.9;
 
-setTimeout(function(){ t.style.opacity = 0; t.style.backgroundColor = '#f00';},1);
+    setTimeout(function(){ t.style.opacity = 0; t.style.backgroundColor = '#f00';},1);
 
     document.body.appendChild(t);
     setTimeout(function(){ document.body.removeChild(t)},2000);
