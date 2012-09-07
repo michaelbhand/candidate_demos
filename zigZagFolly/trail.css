@@ -1,0 +1,21 @@
+.wander {
+    background-color: red;
+    /*background: -webkit-gradient(radial, 0 40%, 30 25%, )*/
+    /*border-radius: 30px;*/
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    opacity: 0.8;    
+    -webkit-transition: top 0.5s ease-in-out, left 0.5s ease-in-out;
+    -moz-transition: top 0.5s ease-in-out, left 0.5s ease-in-out;
+}
+
+.trail {
+    background-color: white;
+    /*border-radius: 30px;*/
+    width: 30px;
+    height: 30px;
+    position: absolute;    
+    -webkit-transition: opacity 3s ease-in-out;
+    -moz-transition: opacity 3s ease-in-out;
+}
