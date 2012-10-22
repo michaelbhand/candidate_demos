@@ -1,3 +1,5 @@
+var wanderA = [];
+
 (function() {
 	var windowWidth = window.innerWidth,
 		windowHeight = window.innerHeight;
@@ -30,6 +32,7 @@
 		this.directionY = -1;
 		this.moveXAmount = 0;
 		this.moveYAmount = 0;
+		this.timeBlock = getRandomPoint(500);
 		this.domElement = document.createElement("div");
 		this.domElement.style.position = "absolute";
 		this.domElement.style.top = y - Math.floor(this.size/2) + "px";
@@ -40,6 +43,9 @@
 		this.domElement.style.background = "#f00";
 		this.domElement.style.zIndex = Math.ceil(this.size);
         this.domElement.style.backgroundImage = "-webkit-radial-gradient(25% 25%,farthest-corner, " + randomColor() + ", " + randomColor() + ")";
+
+        // wanderA[0].domElement.style.webkitTransition = "top 1s ease-in-out, left 1s ease-in-out";
+
 		this.domElement.className = 'wander';
 		document.body.appendChild(this.domElement);
 	}
@@ -53,14 +59,22 @@
 		this.moveXAmount = getRandomPoint(100) * this.directionX;
 		this.moveYAmount = getRandomPoint(100) * this.directionY;
 
-		// How do we get the Wandere to stay here.
-		if (Math.abs(this.x + this.moveXAmount) < (windowWidth * 0.25 ) || Math.abs(this.x + this.moveXAmount) > (windowWidth * 0.75 )) {
-			this.moveXAmount = (this.x - (windowWidth / 2 )) / 10;
-		}
+		// // How do we get the Wandere to stay here.
+		// if (Math.abs(this.x + this.moveXAmount) < (windowWidth * 0.25 ) || Math.abs(this.x + this.moveXAmount) > (windowWidth * 0.75 )) {
+		// 	this.moveXAmount = (this.x - (windowWidth / 2 )) / 10;
+		// }
 
-		if (Math.abs(this.y + this.moveYAmount) < (windowHeight * 0.25 ) || Math.abs(this.y + this.moveYAmount) > (windowHeight * 0.75 )) {
+		// if (Math.abs(this.y + this.moveYAmount) < (windowHeight * 0.25 ) || Math.abs(this.y + this.moveYAmount) > (windowHeight * 0.75 )) {
+		// 	this.moveYAmount = (this.y - (windowHeight / 2 )) / 10;
+		// }
+
+		if (distanceFromCenter(this.x + this.moveXAmount,this.y + this.moveYAmount) > windowHeight * 0.75) {
+			console.log();
+			this.moveXAmount = (this.x - (windowWidth / 2 )) / 10;
 			this.moveYAmount = (this.y - (windowHeight / 2 )) / 10;
 		}
+
+
 
 		if(this.turn > 0){
 			this.moveXAmount = 0;
@@ -90,8 +104,8 @@
         }
     };
 
-    var wanderA = [];
-    var actorCount = 50;
+
+    var actorCount = 112;
     document.body.style.backgroundImage = "-webkit-radial-gradient(25% 25%,farthest-corner, " + randomColor() + ", " + randomColor() + ")";
 
     for(var i = 0; i < actorCount; i++){
@@ -99,10 +113,12 @@
     }
 
 	function update() {
-    for(var i = 0; i < actorCount; i++){
-		wanderA[i].update();
-    }
-		setTimeout(update, 500);
+	    for(var i = 0; i < actorCount; i++){
+			wanderA[i].update();
+	    }
+		// setTimeout(update, getRandomPoint(200) + 50);
+		setTimeout(update, 1000);
+		// setTimeout(update, getRandomPoint(1000) + 1000);
 	}
 
 	update();
